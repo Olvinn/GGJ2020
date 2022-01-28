@@ -17,14 +17,13 @@ namespace Controllers.Player
         public MovementState state { get; private set; }
 
         [SerializeField] PlayerData _data;
+        [SerializeField] Transform _visuals;
 
         CharacterController _characterController;
 
         //Conditions
         bool _isJumping;
         bool _isSprinting;
-        bool _isCrouching;
-        bool _isCrouchOnly;
         bool _isSliding;
         bool _isFalling;
 
@@ -51,6 +50,15 @@ namespace Controllers.Player
         {
             DefineState();
             MovementProcessor();
+            RotationProcessor();
+        }
+
+        private void RotationProcessor()
+        {
+            float _rotationEffector = GetCurrentSpeed() / _data.speed;
+            Vector3 temp = _inertia;
+            temp.y = 0;
+            _visuals.rotation = Quaternion.Lerp(_visuals.rotation, Quaternion.LookRotation(temp), _rotationEffector);
         }
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -68,7 +76,7 @@ namespace Controllers.Player
                 hit.rigidbody.AddForceAtPosition(hit.normal * power, hit.point, ForceMode.Force);
             }
 
-            _movementGroundDot = Vector3.Dot(/*_characterController.transform.localToWorldMatrix * */new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
+            _movementGroundDot = Vector3.Dot(new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
             _speedModifier = _movementGroundDot <= 0f ? 1 + _movementGroundDot : 1;
             _isSliding = false;
             if (_inertia.magnitude > _data.sprintSpeed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
@@ -100,10 +108,8 @@ namespace Controllers.Player
                     _isFalling = false;
                 }
 
-                if (_isSliding || (_isCrouching && _characterController.velocity.magnitude > _data.speed))
+                if (_isSliding || (_characterController.velocity.magnitude > _data.speed))
                     state = MovementState.Slide;
-                else if (_isCrouchOnly || _isCrouching)
-                    state = MovementState.Crouch;
                 else if (_isSprinting && _movement.y > 0)
                     state = MovementState.Sprint;
                 else
@@ -123,7 +129,6 @@ namespace Controllers.Player
                         newMov *= _data.speed;
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
                         _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
-                        SetHeight(Mathf.Lerp(_characterController.height, _data.height, Time.deltaTime * 5));
                         if (_isJumping)
                             _inertia.y = _data.jumpPower;
 
@@ -138,22 +143,7 @@ namespace Controllers.Player
                         newMov.z *= _data.sprintSpeed;
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
                         _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.sprintSpeed * _data.acceleration * Time.deltaTime);
-                        SetHeight(Mathf.Lerp(_characterController.height, _data.height, Time.deltaTime * 5));
                         if (_isJumping)
-                            _inertia.y = _data.jumpPower;
-
-                        _characterController.Move(_inertia * Time.deltaTime);
-                        if (!_isJumping)
-                            _characterController.Move(Vector3.down * _characterController.stepOffset);
-                        break;
-                    }
-                case MovementState.Crouch:
-                    {
-                        newMov *= _data.speed * .5f;
-                        newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
-                        SetHeight(Mathf.Lerp(_characterController.height, _data.crouchHeight, Time.deltaTime * 5));
-                        if (_isJumping && !_isCrouchOnly)
                             _inertia.y = _data.jumpPower;
 
                         _characterController.Move(_inertia * Time.deltaTime);
@@ -163,10 +153,15 @@ namespace Controllers.Player
                     }
                 case MovementState.Fall:
                     {
+                        newMov *= _data.speed;
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia += newMov * _data.acceleration * Time.deltaTime * .1f;
+                        float y = _inertia.y;
+                        _inertia.y = 0;
+
+                        _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
+
+                        _inertia.y = y;
                         _inertia += Physics.gravity * Time.deltaTime;
-                        SetHeight(Mathf.Lerp(_characterController.height, _isCrouching || _isSliding ? _data.crouchHeight : _data.height, Time.deltaTime * 10));
 
                         _characterController.Move(_inertia * Time.deltaTime);
                         break;
@@ -175,7 +170,6 @@ namespace Controllers.Player
                     {
                         _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
                         _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
-                        SetHeight(Mathf.Lerp(_characterController.height, _data.crouchHeight, Time.deltaTime * 10));
 
                         _characterController.Move(_inertia * Time.deltaTime);
                         break;
@@ -183,12 +177,6 @@ namespace Controllers.Player
             }
 
             _isJumping = false;
-        }
-
-        void SetHeight(float height)
-        {
-            _characterController.Move(Vector3.up * (height - _characterController.height) * .5f);
-            _characterController.height = height;
         }
 
         public void Init(PlayerData data)
@@ -204,16 +192,6 @@ namespace Controllers.Player
         public void Sprint(bool sprint)
         {
              _isSprinting = sprint;
-        }
-
-        public void Crouch(bool crouch)
-        {
-             _isCrouching = crouch;
-        }
-
-        public void CrouchOnly(bool crouch)
-        {
-            _isCrouchOnly = crouch;
         }
 
         public void Move(Vector3 movement)
@@ -241,7 +219,6 @@ namespace Controllers.Player
     {
         Normal = 0,
         Sprint,
-        Crouch,
         Fall,
         Slide
     }

@@ -9,10 +9,6 @@ namespace Data.Game
     [CreateAssetMenu(menuName = "Data/Player data")]
     public class PlayerData : ScriptableObject
     {
-        //physics
-        public float height;
-        public float crouchHeight;
-
         //movement
         public float speed;
         public float sprintSpeed;

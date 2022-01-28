@@ -20,18 +20,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Vector3 dir = new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical"));
+        Vector3 dir = Camera.main.worldToCameraMatrix * new Vector3(Input.GetAxis("Horizontal"), 0, -Input.GetAxis("Vertical"));
         _player.Move(dir);
         if (Input.GetAxis("Jump") > 0)
             _player.Jump();
 
         _rotationEffector = _player.GetCurrentSpeed() / _data.speed;
         _rotationEffector = Mathf.Clamp01(_rotationEffector);
-
-        //_player.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_inertia), _rotationEffector * Time.deltaTime * 10);
-
-        _cameraDirection = dir;
-        _cameraDirection.y = 0;
-        _player.transform.rotation = Quaternion.Lerp(_player.transform.rotation, Quaternion.LookRotation(_cameraDirection, Vector3.up), _rotationEffector * Time.deltaTime);
     }
 }
