@@ -17,6 +17,7 @@ namespace Controllers.Player
         public MovementState state { get; private set; }
 
         [SerializeField] PlayerData _data;
+        [SerializeField] Transform _visuals;
 
         CharacterController _characterController;
 
@@ -51,6 +52,13 @@ namespace Controllers.Player
         {
             DefineState();
             MovementProcessor();
+            RotationProcessor();
+        }
+
+        private void RotationProcessor()
+        {
+            float _rotationEffector = GetCurrentSpeed() / _data.speed;
+            _visuals.rotation = Quaternion.Lerp(_visuals.rotation, Quaternion.LookRotation(_inertia), _rotationEffector);
         }
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -68,7 +76,7 @@ namespace Controllers.Player
                 hit.rigidbody.AddForceAtPosition(hit.normal * power, hit.point, ForceMode.Force);
             }
 
-            _movementGroundDot = Vector3.Dot(/*_characterController.transform.localToWorldMatrix * */new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
+            _movementGroundDot = Vector3.Dot(new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
             _speedModifier = _movementGroundDot <= 0f ? 1 + _movementGroundDot : 1;
             _isSliding = false;
             if (_inertia.magnitude > _data.sprintSpeed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
