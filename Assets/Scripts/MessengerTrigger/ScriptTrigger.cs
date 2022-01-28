@@ -1,10 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace MessengerTrigger
 {
+    /// <summary>
+    /// Включает какое-то событие, если игрок задевает коллайдер
+    /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class TriggerOnPath : MonoBehaviour
+    public class ScriptTrigger : MonoBehaviour
     {
         [System.Serializable]
         public class TriggerEvent : UnityEvent
@@ -12,33 +15,39 @@ namespace MessengerTrigger
         }
 
         [Tooltip("Коллайдер, с которым нужно столкнуться игроку, чтобы активировать эвент.")] [SerializeField]
-        private Collider triggerCollider;
+        protected Collider triggerCollider;
 
         [Tooltip("Эвент, который активируется после столкновения с коллайдером")] [SerializeField]
-        private TriggerEvent triggerEvent;
+        protected TriggerEvent triggerEvent;
 
         [Tooltip("Показывает границы коллайдера (В виде куба)")] [SerializeField]
-        private bool showDebugBounds;
+        protected bool showDebugBounds;
 
         [Tooltip("Если true - эвент вызовется только один раз.")] [SerializeField]
-        private bool triggerOneTime;
+        protected bool triggerOneTime;
+
+        protected bool WasTriggered;
 
         /// <summary>
         /// Эвент, который активируется после столкновения игрока с коллайдером
         /// </summary>
         public TriggerEvent PlayerTriggerEvent => triggerEvent;
 
-        private bool _wasTriggered;
-
-        private void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
-            if (_wasTriggered) return;
+            // TODO check if collider is player
+            TriggerScript();
+        }
 
-            if (triggerOneTime) _wasTriggered = true;
+        protected void TriggerScript()
+        {
+            if (WasTriggered) return;
+            if (triggerOneTime) WasTriggered = true;
             triggerEvent?.Invoke();
         }
 
-        private void OnDrawGizmos()
+
+        protected virtual void OnDrawGizmos()
         {
             if (!showDebugBounds || !triggerCollider) return;
 
