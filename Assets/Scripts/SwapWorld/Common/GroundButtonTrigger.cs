@@ -1,4 +1,7 @@
-﻿using SwapWorld.Base;
+﻿using System;
+using System.Collections;
+using SwapWorld.Base;
+using SwapWorld.Tools;
 using UnityEngine;
 
 namespace SwapWorld.Common
@@ -9,38 +12,47 @@ namespace SwapWorld.Common
         [SerializeField] private Vector3 buttonDirection = Vector3.up;
         [SerializeField] private LayerMask collisionMask;
         [SerializeField] private float buttonRadius;
+        [SerializeField] private Vector3 pressedLocalPosition;
+
+        private Vector3 _startPosition;
         private float _stayTime;
         private bool _isTriggered;
-        private Collision _lastTriggeredCollision;
+        private Coroutine _buttonAnimationCoroutine;
 
-        private void OnCollisionEnter(Collision other)
+        private void Start()
         {
-            _stayTime = 0f;
-            _isTriggered = true;
-            _lastTriggeredCollision = other;
+            _startPosition = transform.localPosition;
         }
 
         private void Update()
         {
-            if (!_isTriggered) return;
-            if (!CheckButtonCollision(_lastTriggeredCollision)) return;
-            _stayTime += Time.deltaTime;
-            if (_stayTime >= stayTimeTrigger)
+            bool isPressed = CheckButtonCollision();
+            if (isPressed)
             {
-                Debug.Log($"Change world by Button {name} ({nameof(GroundButtonTrigger)})");
+                if (!_isTriggered)
+                {
+                    _isTriggered = true;
+                    _stayTime = 0f;
+                    ButtonPressed();
+                }
+                else if (_stayTime >= 0)
+                {
+                    _stayTime += Time.deltaTime;
+                    if (_stayTime >= stayTimeTrigger)
+                    {
+                        _stayTime = -1f;
+                        Debug.Log($"Change world by Button {name} ({nameof(GroundButtonTrigger)})");
+                        TriggerToSwitch();
+                    }
+                }
+            }
+            else if (_isTriggered)
+            {
                 _isTriggered = false;
                 _stayTime = 0f;
-                TriggerToSwitch();
+                ButtonReleased();
             }
         }
-
-        private void OnCollisionExit()
-        {
-            _isTriggered = false;
-            _stayTime = 0f;
-            _lastTriggeredCollision = null;
-        }
-
 
         private void OnDrawGizmosSelected()
         {
@@ -50,20 +62,39 @@ namespace SwapWorld.Common
             position += buttonDirection;
 
             Matrix4x4 oldMatrix = Gizmos.matrix;
-            Gizmos.matrix = Matrix4x4.TRS(position, Quaternion.LookRotation(buttonDirection, transform.up) * Quaternion.Euler(90, 0,0), new Vector3(1, 0.01f, 1));
+            Gizmos.matrix = Matrix4x4.TRS(position,
+                Quaternion.LookRotation(buttonDirection, transform.up) * Quaternion.Euler(90, 0, 0),
+                new Vector3(1, 0.01f, 1));
             Gizmos.DrawSphere(Vector3.zero, buttonRadius);
             Gizmos.matrix = oldMatrix;
         }
 
-        private bool CheckButtonCollision(Collision collision)
+        private bool CheckButtonCollision()
         {
             var currentPosition = transform.position - buttonDirection;
-            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out var hitInfo, 3f,
+            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out _, 1f,
                 collisionMask);
             Debug.DrawRay(currentPosition, buttonDirection, cast ? Color.green : Color.red);
             if (!cast) return false;
+            return true;
+        }
 
-            return collision.transform == hitInfo.transform;
+        private void ButtonPressed()
+        {
+            this.RestartCoroutine(ref _buttonAnimationCoroutine, ButtonAnimation(true));
+        }
+
+        private void ButtonReleased()
+        {
+            this.RestartCoroutine(ref _buttonAnimationCoroutine, ButtonAnimation(false));
+        }
+
+        private IEnumerator ButtonAnimation(bool isPressed)
+        {
+            var currentPos = transform.localPosition;
+            var targetPos = isPressed ? pressedLocalPosition + _startPosition : _startPosition;
+            yield return CoroutineExtensions.ElapsedCoroutine(stayTimeTrigger,
+                f => { transform.localPosition = Vector3.Lerp(currentPos, targetPos, f); });
         }
     }
 }
