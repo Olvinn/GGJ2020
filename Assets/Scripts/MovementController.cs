@@ -170,6 +170,8 @@ namespace Controllers.Player
                     {
                         _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
                         _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
+                        if (_isJumping)
+                            _inertia.y = _data.jumpPower;
 
                         _characterController.Move(_inertia * Time.deltaTime);
                         break;

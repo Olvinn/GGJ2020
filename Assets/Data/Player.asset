@@ -12,13 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c6b4df4ed839a649a85245252c4bb10, type: 3}
   m_Name: Player
   m_EditorClassIdentifier: 
-  height: 2
-  crouchHeight: 1
   speed: 5
   sprintSpeed: 10
   jumpPower: 10
   acceleration: 5
   slideAngle: 45
   slideStoppingModifier: 0.8
-  bounceness: 0.25
+  bounceness: 0
   useDistance: 1
