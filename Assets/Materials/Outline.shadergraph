@@ -1563,8 +1563,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 344.0000305175781,
-            "y": 1007.0000610351563,
+            "x": 408.9999694824219,
+            "y": 968.9999389648438,
             "width": 130.0,
             "height": 118.0
         }
@@ -3394,10 +3394,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 348.0000305175781,
-            "y": 1193.0,
-            "width": 126.0,
-            "height": 77.00000762939453
+            "x": 413.0,
+            "y": 1155.0,
+            "width": 125.99999237060547,
+            "height": 77.0
         }
     },
     "m_Slots": [
@@ -3780,9 +3780,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 209.99998474121095,
-            "y": 1236.0,
-            "width": 111.00000762939453,
+            "x": 274.9999694824219,
+            "y": 1198.0,
+            "width": 110.99999237060547,
             "height": 34.0
         }
     },
@@ -4093,10 +4093,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 114.0,
-            "y": 1002.0,
+            "x": 178.99998474121095,
+            "y": 964.0,
             "width": 138.0,
-            "height": 77.00000762939453
+            "height": 77.0
         }
     },
     "m_Slots": [
@@ -5026,8 +5026,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 611.0,
-            "y": 998.0,
+            "x": 676.0,
+            "y": 960.0,
             "width": 130.0,
             "height": 118.0
         }
@@ -6067,8 +6067,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 474.0,
-            "y": 1007.0000610351563,
+            "x": 538.9999389648438,
+            "y": 968.9999389648438,
             "width": 132.0,
             "height": 94.0
         }
