@@ -47,7 +47,8 @@ namespace SwapWorld.Common
             /// </summary>
             public void ApplyMaterialToRenderer()
             {
-                meshRenderer.material = Material;
+                if (meshRenderer)
+                    meshRenderer.material = Material;
             }
         }
 
