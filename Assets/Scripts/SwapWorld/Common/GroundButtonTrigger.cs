@@ -76,12 +76,10 @@ namespace SwapWorld.Common
         private bool CheckButtonCollision()
         {
             var currentPosition = transform.position - buttonDirection;
-            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out var hit, 1f,
+            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out _, 1f,
                 collisionMask);
             Debug.DrawRay(currentPosition, buttonDirection, cast ? Color.green : Color.red);
             if (!cast) return false;
-
-            Debug.Log(hit.collider.name);
             return true;
         }
 

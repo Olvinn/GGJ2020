@@ -22,7 +22,7 @@ namespace MessengerTrigger
         /// Если есть звук - время звука.
         /// Если нет - примерно 10 символов в секунду.
         /// </summary>
-        public float Length => Sound == null ? Text.Length / 10f : Sound.length;
+        public float Length => Sound == null ? Text.Length / 20f : Sound.length;
 
         /// <summary>
         /// Валидность сообщения. Оно не должно быть пустым.

@@ -5,6 +5,7 @@ using System.Linq;
 using SwapWorld.Tools;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MessengerTrigger
@@ -28,11 +29,9 @@ namespace MessengerTrigger
                 Instance = Instantiate(Resources.Load<Messenger>("Messenger"));
             }
             Instance._panel.gameObject.SetActive(true);
-            foreach (TextMessage m in message)
-            {
-                if (!Instance.messages.Contains(m))
-                    Instance.messages.Add(m);
-            }
+            Instance._messageIndex = -1;
+            Instance.messages = message.ToList();
+            Instance.ShowNextMessageOrDestroy();
             return Instance;
         }
 
@@ -45,9 +44,6 @@ namespace MessengerTrigger
         {
             if (blockerButton)
                 blockerButton.onClick.AddListener(OnBlockerClicked);
-
-            _messageIndex = -1;
-            ShowNextMessageOrDestroy();
         }
 
         private IEnumerator Show()
@@ -71,6 +67,9 @@ namespace MessengerTrigger
         {
             if (_isCurrentCompleted) ShowNextMessageOrDestroy();
             else SkipCurrentMessage();
+
+            if (EventSystem.current)
+                EventSystem.current.SetSelectedGameObject(null);
         }
 
         private void SkipCurrentMessage()
@@ -88,6 +87,7 @@ namespace MessengerTrigger
 
         private void ShowNextMessageOrDestroy()
         {
+            Debug.Log($"index = {_messageIndex}");
             if (++_messageIndex >= messages.Count)
             {
                 _panel.gameObject.SetActive(false);

@@ -23,5 +23,13 @@ namespace MessengerTrigger
                 Messenger.Show(m);
             }
         }
+
+        public void ShowMessageAtIndex(int index)
+        {
+            var m = messages.ElementAtOrDefault(index);
+            if (string.IsNullOrEmpty(m)) return;
+
+            Messenger.Show(new TextMessage(m));
+        }
     }
 }
