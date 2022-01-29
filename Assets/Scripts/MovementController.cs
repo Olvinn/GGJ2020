@@ -58,8 +58,7 @@ namespace Controllers.Player
             float rotationEffector = GetCurrentSpeed() / _data.speed;
             Vector3 temp = _inertia;
             temp.y = 0;
-            temp += transform.forward * .1f;
-            if (GetCurrentSpeed() > 0)
+            if (GetCurrentSpeed() > 0 && temp != Vector3.zero)
                 _visuals.rotation = Quaternion.Lerp(_visuals.rotation, Quaternion.LookRotation(temp), rotationEffector);
         }
 

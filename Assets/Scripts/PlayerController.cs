@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] PlayerData _data;
     [SerializeField] MovementController _player;
+    [SerializeField] Animator _anim;
     [SerializeField] Transform _camera;
 
     float _rotationEffector;
@@ -27,5 +28,26 @@ public class PlayerController : MonoBehaviour
 
         _rotationEffector = _player.GetCurrentSpeed() / _data.speed;
         _rotationEffector = Mathf.Clamp01(_rotationEffector);
+
+        switch (_player.state)
+        {
+            default:
+                _anim.SetBool("Moving", _player.GetCurrentSpeed() > 0);
+                _anim.SetBool("Fall", false);
+                _anim.SetBool("Jump", false);
+                _anim.SetBool("Sliding", false);
+                break;
+            case MovementState.Slide:
+                _anim.SetBool("Fall", false);
+                _anim.SetBool("Jump", false);
+                _anim.SetBool("Moving", _player.GetCurrentSpeed() > 0);
+                _anim.SetBool("Sliding", true);
+                break;
+            case MovementState.Fall:
+                _anim.SetBool("Moving", _player.GetCurrentSpeed() > 0);
+                _anim.SetBool("Fall", _player.GetCurrentVelocity().y < 0);
+                _anim.SetBool("Jump", _player.GetCurrentVelocity().y > 0);
+                break;
+        }
     }
 }
