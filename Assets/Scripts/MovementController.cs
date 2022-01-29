@@ -1,19 +1,21 @@
 using Data.Game;
 using System;
+using MessengerTrigger;
 using UnityEngine;
 
 namespace Controllers.Player
 {
     /// <summary>
-    /// Перемещение CharacterController'a, взаимодействие с миром
+    /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CharacterController'a, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
     /// version 2.1.2
     [RequireComponent(typeof(CharacterController))]
     public class MovementController : MonoBehaviour
     {
         /// <summary>
-        /// Вызывается при приземлении, аргумент - высота падения
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         /// </summary>
         public event Action<float> onGrounded;
+
         public event Action onJump;
         public MovementState state { get; private set; }
 
@@ -40,14 +42,41 @@ namespace Controllers.Player
         //Methods needs
         float speed, power;
 
+        private bool _isBlocked;
+
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
             _characterController.slopeLimit = 90f;
+
+            Messenger.OnStartMessage += BlockController;
+            Messenger.OnEndMessage += UnBlockController;
+            UnBlockController();
+        }
+
+        private void OnDestroy()
+        {
+            Messenger.OnStartMessage -= BlockController;
+            Messenger.OnEndMessage -= UnBlockController;
+        }
+
+        private void BlockController()
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            _isBlocked = true;
+        }
+
+        private void UnBlockController()
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            _isBlocked = false;
         }
 
         private void Update()
         {
+            if (_isBlocked && state == MovementState.Normal) return;
             DefineState();
             MovementProcessor();
             RotationProcessor();
@@ -82,7 +111,8 @@ namespace Controllers.Player
             if (_inertia.magnitude > _data.speed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
             {
                 _isSliding = true;
-                Vector3 dir = Vector3.ProjectOnPlane(_inertia, hit.normal) * (1- _data.bounceness) + Vector3.Reflect(_inertia, hit.normal) * _data.bounceness;
+                Vector3 dir = Vector3.ProjectOnPlane(_inertia, hit.normal) * (1 - _data.bounceness) +
+                              Vector3.Reflect(_inertia, hit.normal) * _data.bounceness;
                 _inertia = dir;
             }
 
@@ -98,6 +128,7 @@ namespace Controllers.Player
                     _fallHeight = 0;
                     _isFalling = true;
                 }
+
                 state = MovementState.Fall;
                 _fallHeight += _inertia.y < 0 ? _inertia.y * Time.deltaTime : 0;
             }
@@ -124,53 +155,53 @@ namespace Controllers.Player
             {
                 default:
                 case MovementState.Normal:
+                {
+                    newMov *= _data.speed;
+                    newMov = _characterController.transform.localToWorldMatrix * newMov;
+                    _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
+                    if (_isJumping)
                     {
-                        newMov *= _data.speed;
-                        newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
-                        if (_isJumping)
-                        {
-                            onJump?.Invoke();
-                            _inertia.y = _data.jumpPower;
-                        }
-
-                        _characterController.Move(_inertia * Time.deltaTime);
-                        if (!_isJumping)
-                            _characterController.Move(Vector3.down * _characterController.stepOffset);
-                        break;
+                        onJump?.Invoke();
+                        _inertia.y = _data.jumpPower;
                     }
+
+                    _characterController.Move(_inertia * Time.deltaTime);
+                    if (!_isJumping)
+                        _characterController.Move(Vector3.down * _characterController.stepOffset);
+                    break;
+                }
                 case MovementState.Fall:
-                    {
-                        newMov *= _data.speed;
-                        newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        newMov.y = 0;
+                {
+                    newMov *= _data.speed;
+                    newMov = _characterController.transform.localToWorldMatrix * newMov;
+                    newMov.y = 0;
 
-                        float y = _inertia.y;
-                        _inertia.y = 0;
+                    float y = _inertia.y;
+                    _inertia.y = 0;
 
-                        _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
+                    _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
 
-                        _inertia.y = y;
-                        _inertia += Physics.gravity * Time.deltaTime;
+                    _inertia.y = y;
+                    _inertia += Physics.gravity * Time.deltaTime;
 
-                        _characterController.Move(_inertia * Time.deltaTime);
-                        break;
-                    }
+                    _characterController.Move(_inertia * Time.deltaTime);
+                    break;
+                }
                 case MovementState.Slide:
+                {
+                    newMov = _characterController.transform.localToWorldMatrix * newMov;
+                    _inertia += newMov * Time.deltaTime * _data.acceleration * .1f;
+                    _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
+                    _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
+                    if (_isJumping)
                     {
-                        newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia += newMov * Time.deltaTime * _data.acceleration * .1f;
-                        _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
-                        _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
-                        if (_isJumping)
-                        {
-                            onJump?.Invoke();
-                            _inertia.y = _data.jumpPower;
-                        }
-
-                        _characterController.Move(_inertia * Time.deltaTime);
-                        break;
+                        onJump?.Invoke();
+                        _inertia.y = _data.jumpPower;
                     }
+
+                    _characterController.Move(_inertia * Time.deltaTime);
+                    break;
+                }
             }
 
             _isJumping = false;
@@ -183,7 +214,7 @@ namespace Controllers.Player
 
         public void Jump()
         {
-             _isJumping = true;
+            _isJumping = true;
         }
 
         public void Move(Vector3 movement)
