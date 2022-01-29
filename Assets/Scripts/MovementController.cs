@@ -80,7 +80,7 @@ namespace Controllers.Player
             _movementGroundDot = Vector3.Dot(new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
             _speedModifier = _movementGroundDot <= 0f ? 1 + _movementGroundDot : 1;
             _isSliding = false;
-            if (_inertia.magnitude > _data.sprintSpeed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
+            if (_inertia.magnitude > _data.speed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
             {
                 _isSliding = true;
                 Vector3 dir = Vector3.ProjectOnPlane(_inertia, hit.normal) * (1- _data.bounceness) + Vector3.Reflect(_inertia, hit.normal) * _data.bounceness;
@@ -109,10 +109,8 @@ namespace Controllers.Player
                     _isFalling = false;
                 }
 
-                if (_isSliding || (_characterController.velocity.magnitude > _data.sprintSpeed))
+                if (_isSliding || (_characterController.velocity.magnitude > _data.speed * 1.5f))
                     state = MovementState.Slide;
-                else if (_isSprinting && _movement.y > 0)
-                    state = MovementState.Sprint;
                 else
                     state = MovementState.Normal;
             }
@@ -138,20 +136,6 @@ namespace Controllers.Player
                             _characterController.Move(Vector3.down * _characterController.stepOffset);
                         break;
                     }
-                case MovementState.Sprint:
-                    {
-                        newMov.x *= _data.speed;
-                        newMov.z *= _data.sprintSpeed;
-                        newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.sprintSpeed * _data.acceleration * Time.deltaTime);
-                        if (_isJumping)
-                            _inertia.y = _data.jumpPower;
-
-                        _characterController.Move(_inertia * Time.deltaTime);
-                        if (!_isJumping)
-                            _characterController.Move(Vector3.down * _characterController.stepOffset);
-                        break;
-                    }
                 case MovementState.Fall:
                     {
                         newMov *= _data.speed;
@@ -169,6 +153,8 @@ namespace Controllers.Player
                     }
                 case MovementState.Slide:
                     {
+                        newMov = _characterController.transform.localToWorldMatrix * newMov;
+                        _inertia += newMov * Time.deltaTime * _data.acceleration;
                         _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
                         _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
                         if (_isJumping)
@@ -190,11 +176,6 @@ namespace Controllers.Player
         public void Jump()
         {
              _isJumping = true;
-        }
-
-        public void Sprint(bool sprint)
-        {
-             _isSprinting = sprint;
         }
 
         public void Move(Vector3 movement)
@@ -221,7 +202,6 @@ namespace Controllers.Player
     public enum MovementState
     {
         Normal = 0,
-        Sprint,
         Fall,
         Slide
     }

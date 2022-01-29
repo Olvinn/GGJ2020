@@ -11,7 +11,6 @@ namespace Data.Game
     {
         //movement
         public float speed;
-        public float sprintSpeed;
         public float jumpPower;
         public float acceleration;
         [Range(15, 89)] 
