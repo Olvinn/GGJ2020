@@ -55,10 +55,12 @@ namespace Controllers.Player
 
         private void RotationProcessor()
         {
-            float _rotationEffector = GetCurrentSpeed() / _data.speed;
+            float rotationEffector = GetCurrentSpeed() / _data.speed;
             Vector3 temp = _inertia;
             temp.y = 0;
-            _visuals.rotation = Quaternion.Lerp(_visuals.rotation, Quaternion.LookRotation(temp), _rotationEffector);
+            temp += transform.forward * .1f;
+            if (GetCurrentSpeed() > 0)
+                _visuals.rotation = Quaternion.Lerp(_visuals.rotation, Quaternion.LookRotation(temp), rotationEffector);
         }
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -108,7 +110,7 @@ namespace Controllers.Player
                     _isFalling = false;
                 }
 
-                if (_isSliding || (_characterController.velocity.magnitude > _data.speed))
+                if (_isSliding || (_characterController.velocity.magnitude > _data.sprintSpeed))
                     state = MovementState.Slide;
                 else if (_isSprinting && _movement.y > 0)
                     state = MovementState.Sprint;
