@@ -22,16 +22,24 @@ namespace MessengerTrigger
         private bool _isCurrentCompleted;
         private Coroutine _showTextCoroutine;
 
+        public delegate void MessengerEvent();
+
+        public static event MessengerEvent OnStartMessage;
+        public static event MessengerEvent OnEndMessage;
+
+
         public static Messenger Show(params TextMessage[] message)
         {
             if (!Instance)
             {
                 Instance = Instantiate(Resources.Load<Messenger>("Messenger"));
             }
+
             Instance._panel.gameObject.SetActive(true);
             Instance._messageIndex = -1;
             Instance.messages = message.ToList();
             Instance.ShowNextMessageOrDestroy();
+            OnStartMessage?.Invoke();
             return Instance;
         }
 
@@ -91,6 +99,7 @@ namespace MessengerTrigger
             if (++_messageIndex >= messages.Count)
             {
                 _panel.gameObject.SetActive(false);
+                OnEndMessage?.Invoke();
             }
             else
             {
