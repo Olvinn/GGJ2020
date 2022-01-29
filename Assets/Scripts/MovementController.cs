@@ -96,16 +96,17 @@ namespace Controllers.Player
             {
                 if (!_isFalling)
                 {
-                    _fallHeight = transform.position.y;
+                    _fallHeight = 0;
                     _isFalling = true;
                 }
                 state = MovementState.Fall;
+                _fallHeight += _inertia.y < 0 ? _inertia.y * Time.deltaTime : 0;
             }
             else
             {
                 if (_isFalling)
                 {
-                    onGrounded?.Invoke(transform.position.y - _fallHeight);
+                    onGrounded?.Invoke(_fallHeight);
                     _isFalling = false;
                 }
 

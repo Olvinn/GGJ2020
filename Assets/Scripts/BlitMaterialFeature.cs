@@ -71,7 +71,7 @@ public class BlitMaterialFeature : ScriptableRendererFeature
     }
 
     [SerializeField]
-    private Settings settings = new Settings();
+    public Settings settings = new Settings();
 
     private RenderPass renderPass;
 

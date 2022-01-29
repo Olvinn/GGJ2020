@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: 
   speed: 5
-  sprintSpeed: 10
   jumpPower: 10
   acceleration: 5
-  slideAngle: 45
-  slideStoppingModifier: 0.2
+  slideAngle: 30
+  slideStoppingModifier: 0.8
   bounceness: 0
   useDistance: 1

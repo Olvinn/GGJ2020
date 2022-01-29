@@ -8,7 +8,7 @@ namespace SwapWorld.Base
     /// </summary>
     public sealed class WorldStateEventManger : MonoBehaviour
     {
-        [SerializeField] private WorldState worldState = WorldState.Black;
+        [SerializeField] private WorldState worldState = WorldState.White;
 
         private void Awake()
         {

@@ -91,6 +91,7 @@ Material:
     m_Floats:
     - Boolean_024a93900f40454197153134acc26fad: 0
     - Vector1_11f1a8796d6d4d269b0d7c579f60eb92: 8
+    - Vector1_17a93713b92e4c1786a25fb1e6339b24: 0
     - Vector1_4fa6515d19a646df861f81ed8e34c0dc: 1
     - Vector1_efeef94b67a84546a293fbf915952f10: 1000
     - _AlphaClip: 0
@@ -107,6 +108,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _Inverse: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
