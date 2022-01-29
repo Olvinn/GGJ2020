@@ -36,7 +36,6 @@ namespace Controllers.Player
 
         //Movement modifiers
         float _movementGroundDot;
-        float _speedModifier;
 
         //Methods needs
         float speed, power;
@@ -79,7 +78,6 @@ namespace Controllers.Player
             }
 
             _movementGroundDot = Vector3.Dot(new Vector3(_movement.x, 0, _movement.y).normalized, _groundNormal);
-            _speedModifier = _movementGroundDot <= 0f ? 1 + _movementGroundDot : 1;
             _isSliding = false;
             if (_inertia.magnitude > _data.speed + 1 || Vector3.Angle(normal, Vector3.up) > _data.slideAngle)
             {
@@ -129,7 +127,7 @@ namespace Controllers.Player
                     {
                         newMov *= _data.speed;
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
+                        _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
                         if (_isJumping)
                         {
                             onJump?.Invoke();
@@ -145,10 +143,12 @@ namespace Controllers.Player
                     {
                         newMov *= _data.speed;
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
+                        newMov.y = 0;
+
                         float y = _inertia.y;
                         _inertia.y = 0;
 
-                        _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
+                        _inertia = Vector3.MoveTowards(_inertia, newMov, _data.acceleration * Time.deltaTime);
 
                         _inertia.y = y;
                         _inertia += Physics.gravity * Time.deltaTime;
@@ -159,7 +159,7 @@ namespace Controllers.Player
                 case MovementState.Slide:
                     {
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
-                        _inertia += newMov * Time.deltaTime * _data.acceleration;
+                        _inertia += newMov * Time.deltaTime * _data.acceleration * .1f;
                         _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
                         _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
                         if (_isJumping)

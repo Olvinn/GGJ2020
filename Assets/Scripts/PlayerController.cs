@@ -27,9 +27,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetAxis("Jump") > 0)
             _player.Jump();
 
-        _rotationEffector = _player.GetCurrentSpeed() / _data.speed;
-        _rotationEffector = Mathf.Clamp01(_rotationEffector);
-
         _player.onGrounded += _ac.GroundedSound;
         _player.onJump += _ac.JumpSound;
 

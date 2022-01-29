@@ -39,7 +39,7 @@ namespace MessengerTrigger
             TriggerScript();
         }
 
-        protected void TriggerScript()
+        protected virtual void TriggerScript()
         {
             if (WasTriggered) return;
             if (triggerOneTime) WasTriggered = true;
@@ -64,7 +64,7 @@ namespace MessengerTrigger
             triggerCollider = GetComponent<Collider>();
         }
 
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             if (triggerCollider != null && !triggerCollider.isTrigger)
                 triggerCollider.isTrigger = true;
