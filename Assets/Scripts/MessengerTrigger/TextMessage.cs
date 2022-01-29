@@ -35,5 +35,16 @@ namespace MessengerTrigger
             Text = text;
             Sound = audioClip;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is TextMessage)
+            {
+                TextMessage t = obj as TextMessage;
+                if (t.Text == Text && Sound == t.Sound)
+                    return true;
+            }
+            return base.Equals(obj);
+        }
     }
 }
