@@ -6,16 +6,23 @@ using SwapWorld.Tools;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MessengerTrigger
 {
     public class Messenger : MonoBehaviour
     {
-        public static Messenger Instance;
+        public static Messenger Instance { get; private set; }
         [SerializeField] private TMP_Text text;
         [SerializeField] private Button blockerButton;
-        [SerializeField] Transform _panel;
+
+        [FormerlySerializedAs("_panel")] [SerializeField]
+        private Transform panel;
+
+        [SerializeField] private Image imageForMainCharacter;
+        [SerializeField] private Image imageForOtherCharacter;
+
         private List<TextMessage> messages;
         private TextMessage _currentMessage;
         private int _messageIndex;
@@ -35,7 +42,7 @@ namespace MessengerTrigger
                 Instance = Instantiate(Resources.Load<Messenger>("Messenger"));
             }
 
-            Instance._panel.gameObject.SetActive(true);
+            Instance.panel.gameObject.SetActive(true);
             Instance._messageIndex = -1;
             Instance.messages = message.ToList();
             Instance.ShowNextMessageOrDestroy();
@@ -46,6 +53,8 @@ namespace MessengerTrigger
         private void Awake()
         {
             messages = new List<TextMessage>();
+            imageForMainCharacter.CrossFadeAlpha(0f, 0f, true);
+            imageForOtherCharacter.CrossFadeAlpha(0f, 0f, true);
         }
 
         private void Start()
@@ -61,6 +70,24 @@ namespace MessengerTrigger
             var message = _currentMessage;
             var messageText = message.Text;
             var messageLength = message.Length;
+            if (_currentMessage.CharacterMessage != null)
+            {
+                var sprite = _currentMessage.CharacterMessage.CharacterSprite;
+
+                if (_currentMessage.CharacterMessage.IsMainCharacter)
+                {
+                    imageForMainCharacter.overrideSprite = sprite;
+                    imageForOtherCharacter.CrossFadeAlpha(0f, 0f, true);
+                    imageForMainCharacter.CrossFadeAlpha(1f, 0f, true);
+                }
+                else
+                {
+                    imageForOtherCharacter.overrideSprite = sprite;
+                    imageForOtherCharacter.CrossFadeAlpha(1f, 0f, true);
+                    imageForMainCharacter.CrossFadeAlpha(0f, 0f, true);
+                }
+            }
+
             yield return CoroutineExtensions.ElapsedCoroutine(messageLength, f =>
             {
                 var totalSymbols = Mathf.RoundToInt(messageText.Length * f);
@@ -98,7 +125,7 @@ namespace MessengerTrigger
             Debug.Log($"index = {_messageIndex}");
             if (++_messageIndex >= messages.Count)
             {
-                _panel.gameObject.SetActive(false);
+                panel.gameObject.SetActive(false);
                 OnEndMessage?.Invoke();
             }
             else

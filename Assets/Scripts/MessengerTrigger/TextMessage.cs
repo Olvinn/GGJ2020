@@ -17,6 +17,8 @@ namespace MessengerTrigger
         /// </summary>
         public AudioClip Sound { get; }
 
+        public CharacterMessage CharacterMessage { get; }
+
         /// <summary>
         /// Время в секундах, сколько должно висеть сообщение.
         /// Если есть звук - время звука.
@@ -30,10 +32,11 @@ namespace MessengerTrigger
         /// </summary>
         public bool Valid => !string.IsNullOrWhiteSpace(Text);
 
-        public TextMessage(string text, AudioClip audioClip = null)
+        public TextMessage(string text, AudioClip audioClip = null, CharacterMessage characterMessage = null)
         {
             Text = text;
             Sound = audioClip;
+            CharacterMessage = characterMessage;
         }
 
         public override bool Equals(object obj)
@@ -44,6 +47,7 @@ namespace MessengerTrigger
                 if (t.Text == Text && Sound == t.Sound)
                     return true;
             }
+
             return base.Equals(obj);
         }
     }

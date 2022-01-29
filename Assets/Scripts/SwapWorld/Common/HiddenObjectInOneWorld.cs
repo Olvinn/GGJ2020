@@ -1,19 +1,20 @@
 ﻿using SwapWorld.Base;
 using SwapWorld.Types;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SwapWorld.Common
 {
     public class HiddenObjectInOneWorld : WorldSwitchObject
     {
         [SerializeField] private WorldState hiddenWorldState;
-        [SerializeField] private MeshRenderer meshRenderer;
+        [FormerlySerializedAs("meshRenderer")] [SerializeField] private Renderer objectRenderer;
         [SerializeField] private Collider objectCollider;
 
 
         private void Reset()
         {
-            meshRenderer = GetComponent<MeshRenderer>();
+            objectRenderer = GetComponent<Renderer>();
             objectCollider = GetComponent<Collider>();
         }
 
@@ -25,8 +26,8 @@ namespace SwapWorld.Common
 
         protected virtual void HideObject()
         {
-            if (meshRenderer)
-                meshRenderer.enabled = false;
+            if (objectRenderer)
+                objectRenderer.enabled = false;
 
             if (objectCollider)
                 objectCollider.enabled = false;
@@ -34,8 +35,8 @@ namespace SwapWorld.Common
 
         protected virtual void ShowObject()
         {
-            if (meshRenderer)
-                meshRenderer.enabled = true;
+            if (objectRenderer)
+                objectRenderer.enabled = true;
 
             if (objectCollider)
                 objectCollider.enabled = true;
