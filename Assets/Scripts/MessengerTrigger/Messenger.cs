@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using SwapWorld.Tools;
 using TMPro;
@@ -10,9 +11,11 @@ namespace MessengerTrigger
 {
     public class Messenger : MonoBehaviour
     {
+        public static Messenger Instance;
         [SerializeField] private TMP_Text text;
         [SerializeField] private Button blockerButton;
-        private TextMessage[] messages;
+        [SerializeField] Transform _panel;
+        private List<TextMessage> messages;
         private TextMessage _currentMessage;
         private int _messageIndex;
         private bool _isCurrentCompleted;
@@ -20,9 +23,22 @@ namespace MessengerTrigger
 
         public static Messenger Show(params TextMessage[] message)
         {
-            var messenger = Instantiate(Resources.Load<Messenger>("Messenger"));
-            messenger.messages = message.ToArray();
-            return messenger;
+            if (!Instance)
+            {
+                Instance = Instantiate(Resources.Load<Messenger>("Messenger"));
+            }
+            Instance._panel.gameObject.SetActive(true);
+            foreach (TextMessage m in message)
+            {
+                if (!Instance.messages.Contains(m))
+                    Instance.messages.Add(m);
+            }
+            return Instance;
+        }
+
+        private void Awake()
+        {
+            messages = new List<TextMessage>();
         }
 
         private void Start()
@@ -72,9 +88,9 @@ namespace MessengerTrigger
 
         private void ShowNextMessageOrDestroy()
         {
-            if (++_messageIndex >= messages.Length)
+            if (++_messageIndex >= messages.Count)
             {
-                Destroy(gameObject);
+                _panel.gameObject.SetActive(false);
             }
             else
             {

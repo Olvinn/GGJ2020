@@ -17,6 +17,6 @@ MonoBehaviour:
   jumpPower: 10
   acceleration: 5
   slideAngle: 45
-  slideStoppingModifier: 0.3
+  slideStoppingModifier: 0.2
   bounceness: 0
   useDistance: 1
