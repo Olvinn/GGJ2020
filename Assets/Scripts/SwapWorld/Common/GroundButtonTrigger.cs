@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using SwapWorld.Base;
 using SwapWorld.Tools;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SwapWorld.Common
 {
@@ -13,6 +13,9 @@ namespace SwapWorld.Common
         [SerializeField] private LayerMask collisionMask;
         [SerializeField] private float buttonRadius;
         [SerializeField] private Vector3 pressedLocalPosition;
+        [SerializeField] private UnityEvent onButtonPressed;
+
+        public UnityEvent ButtonPressedEvent => onButtonPressed;
 
         private Vector3 _startPosition;
         private float _stayTime;
@@ -42,6 +45,7 @@ namespace SwapWorld.Common
                     {
                         _stayTime = -1f;
                         Debug.Log($"Change world by Button {name} ({nameof(GroundButtonTrigger)})");
+                        ButtonPressedEvent?.Invoke();
                         TriggerToSwitch();
                     }
                 }
@@ -72,10 +76,12 @@ namespace SwapWorld.Common
         private bool CheckButtonCollision()
         {
             var currentPosition = transform.position - buttonDirection;
-            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out _, 1f,
+            var cast = Physics.SphereCast(currentPosition, buttonRadius, buttonDirection, out var hit, 1f,
                 collisionMask);
             Debug.DrawRay(currentPosition, buttonDirection, cast ? Color.green : Color.red);
             if (!cast) return false;
+
+            Debug.Log(hit.collider.name);
             return true;
         }
 

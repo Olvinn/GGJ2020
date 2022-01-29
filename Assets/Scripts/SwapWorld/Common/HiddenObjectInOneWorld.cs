@@ -8,18 +8,13 @@ namespace SwapWorld.Common
     {
         [SerializeField] private WorldState hiddenWorldState;
         [SerializeField] private MeshRenderer meshRenderer;
+        [SerializeField] private Collider objectCollider;
+
 
         private void Reset()
         {
             meshRenderer = GetComponent<MeshRenderer>();
-        }
-
-        private void Start()
-        {
-            if (meshRenderer == null)
-                meshRenderer = GetComponent<MeshRenderer>();
-
-            if (meshRenderer == null) enabled = false;
+            objectCollider = GetComponent<Collider>();
         }
 
         protected override void OnWorldChanged(WorldState state)
@@ -30,12 +25,20 @@ namespace SwapWorld.Common
 
         protected virtual void HideObject()
         {
-            meshRenderer.enabled = false;
+            if (meshRenderer)
+                meshRenderer.enabled = false;
+
+            if (objectCollider)
+                objectCollider.enabled = false;
         }
 
         protected virtual void ShowObject()
         {
-            meshRenderer.enabled = true;
+            if (meshRenderer)
+                meshRenderer.enabled = true;
+
+            if (objectCollider)
+                objectCollider.enabled = true;
         }
     }
 }
