@@ -14,6 +14,7 @@ namespace Controllers.Player
         /// Вызывается при приземлении, аргумент - высота падения
         /// </summary>
         public event Action<float> onGrounded;
+        public event Action onJump;
         public MovementState state { get; private set; }
 
         [SerializeField] PlayerData _data;
@@ -130,7 +131,10 @@ namespace Controllers.Player
                         newMov = _characterController.transform.localToWorldMatrix * newMov;
                         _inertia = Vector3.MoveTowards(_inertia, newMov * _speedModifier, _data.speed * _data.acceleration * Time.deltaTime);
                         if (_isJumping)
+                        {
+                            onJump?.Invoke();
                             _inertia.y = _data.jumpPower;
+                        }
 
                         _characterController.Move(_inertia * Time.deltaTime);
                         if (!_isJumping)
@@ -159,7 +163,10 @@ namespace Controllers.Player
                         _inertia -= _inertia * _data.slideStoppingModifier * Time.deltaTime;
                         _inertia += Physics.gravity * Time.deltaTime * (1 - _movementGroundDot);
                         if (_isJumping)
+                        {
+                            onJump?.Invoke();
                             _inertia.y = _data.jumpPower;
+                        }
 
                         _characterController.Move(_inertia * Time.deltaTime);
                         break;
