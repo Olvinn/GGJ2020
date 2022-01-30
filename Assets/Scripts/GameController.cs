@@ -23,7 +23,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        _loader.Hide(2);
+        _loader.Hide(5);
         WorldStateEventManger.OnWorldHasChanged += ChangeWorld;
     }
 

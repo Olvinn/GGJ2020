@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   jumpPower: 10
-  acceleration: 5
+  acceleration: 20
   slideAngle: 30
   slideStoppingModifier: 0.8
   bounceness: 0

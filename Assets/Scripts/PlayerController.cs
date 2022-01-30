@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] MovementController _player;
     [SerializeField] Animator _anim;
     [SerializeField] Transform _camera;
+    [SerializeField] CharacterAudioController _ac;
 
     float _rotationEffector;
     Vector3 _cameraDirection;
@@ -26,8 +27,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetAxis("Jump") > 0)
             _player.Jump();
 
-        _rotationEffector = _player.GetCurrentSpeed() / _data.speed;
-        _rotationEffector = Mathf.Clamp01(_rotationEffector);
+        _player.onGrounded += _ac.GroundedSound;
+        _player.onJump += _ac.JumpSound;
 
         switch (_player.state)
         {
