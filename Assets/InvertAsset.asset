@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8682854018078793803
+--- !u!114 &-2338977805848621276
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,14 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09bda78312ddfd946891b9ba874df06b, type: 3}
-  m_Name: NewBlitMaterialFeature
+  m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
+  m_Name: NewScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: 
   m_Active: 1
-  settings:
-    material: {fileID: 2100000, guid: 94a04f35446a12f40a5d1c5413ac28cd, type: 2}
-    materialPassIndex: -1
-    renderEvent: 500
+  m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
+  m_Settings:
+    Downsample: 0
+    Source: 1
+    NormalSamples: 1
+    Intensity: 2.59
+    DirectLightingStrength: 0.319
+    Radius: 1
+    SampleCount: 4
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27,12 +32,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
-  m_Name: General_Renderer
+  m_Name: InvertAsset
   m_EditorClassIdentifier: 
   m_RendererFeatures:
-  - {fileID: 2594986683006841863}
-  - {fileID: 1771177503952865427}
-  m_RendererFeatureMap: 07f47dada33e0324930846458e7c9418
+  - {fileID: 6919829195904739832}
+  - {fileID: -2338977805848621276}
+  m_RendererFeatureMap: f86947a8fd2b086024cfdef813488adf
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -61,29 +66,7 @@ MonoBehaviour:
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
   m_AccurateGbufferNormals: 0
---- !u!114 &1771177503952865427
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
-  m_Name: NewScreenSpaceAmbientOcclusion
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
-  m_Settings:
-    Downsample: 0
-    Source: 1
-    NormalSamples: 1
-    Intensity: 2.59
-    DirectLightingStrength: 0.319
-    Radius: 1
-    SampleCount: 4
---- !u!114 &2594986683006841863
+--- !u!114 &6919829195904739832
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,23 +76,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09bda78312ddfd946891b9ba874df06b, type: 3}
-  m_Name: BlitMaterialFeature
+  m_Name: NewBlitMaterialFeature
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    material: {fileID: 2100000, guid: 94a04f35446a12f40a5d1c5413ac28cd, type: 2}
+    material: {fileID: 2100000, guid: e34a5f4d88c0d8342bc6acfe87a40ebf, type: 2}
     materialPassIndex: 0
     renderEvent: 450
---- !u!114 &5287606484904420691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 719d6c9cee16a9244ae3d1e507dfd50c, type: 3}
-  m_Name: DepthNormalsFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
