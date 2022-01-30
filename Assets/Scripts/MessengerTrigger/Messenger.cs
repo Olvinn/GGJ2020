@@ -122,7 +122,6 @@ namespace MessengerTrigger
 
         private void ShowNextMessageOrDestroy()
         {
-            Debug.Log($"index = {_messageIndex}");
             if (++_messageIndex >= messages.Count)
             {
                 panel.gameObject.SetActive(false);
