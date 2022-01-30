@@ -59,9 +59,10 @@ namespace MessengerTrigger
                 }
                 else
                 {
-                    Messenger.OnEndMessage += OnComplete;
+                    //Messenger.OnEndMessage += OnComplete;
                     var m = completeMessages.Select(c => new TextMessage(c, characterMessage: character));
                     Messenger.Show(m.ToArray());
+                    OnComplete();
                 }
             }
         }

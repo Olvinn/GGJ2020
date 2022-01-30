@@ -4,7 +4,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class GameController : MonoBehaviour
 
     [SerializeField] ForwardRendererData _data;
     [SerializeField] Widget _loader;
+    [SerializeField] Volume _volume;
 
     private void Awake()
     {
@@ -34,11 +37,35 @@ public class GameController : MonoBehaviour
             switch (state)
             {
                 case WorldState.White:
-                    s.settings.material.SetFloat("_Inverse", 0);
-                    break;
+                    {
+                        s.settings.material.SetFloat("_Inverse", 0);
+                        Vignette vignette;
+                        if (_volume.profile.TryGet(out vignette))
+                        {
+                            vignette.active = false;
+                        }
+                        ChromaticAberration aberration;
+                        if (_volume.profile.TryGet(out aberration))
+                        {
+                            aberration.active = false;
+                        }
+                        break;
+                    }
                 case WorldState.Black:
-                    s.settings.material.SetFloat("_Inverse", 1);
-                    break;
+                    {
+                        s.settings.material.SetFloat("_Inverse", 1);
+                        Vignette vignette;
+                        if (_volume.profile.TryGet(out vignette))
+                        {
+                            vignette.active = true;
+                        }
+                        ChromaticAberration aberration;
+                        if (_volume.profile.TryGet(out aberration))
+                        {
+                            aberration.active = true;
+                        }
+                        break;
+                    }
             }
             _data.SetDirty();
         }));
@@ -47,6 +74,11 @@ public class GameController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void LoadEngame()
+    {
+        LoaderDelay(2, () => SceneManager.LoadScene(2));
     }
 
     private void OnDisable()
